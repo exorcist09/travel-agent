@@ -320,12 +320,12 @@ export default function AgentLensLandingPage() {
         </section>
 
         {/* ========================================================= */}
-        {/* 6. HOW I CAN CONTRIBUTE                                   */}
+        {/* 6. HOW I CAN CONTRIBUTE TO THE TEAM                       */}
         {/* ========================================================= */}
         <section className="space-y-6">
           <div className="space-y-1">
             <h2 className="text-2xl font-bold text-white tracking-tight">
-              How I Can Contribute
+              How I Can Contribute to the Team
             </h2>
             <p className="text-sm text-zinc-400">
               Key engineering areas where I can add direct value:
