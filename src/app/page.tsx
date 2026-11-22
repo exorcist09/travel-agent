@@ -503,11 +503,14 @@ export default function AgentLensLandingPage() {
         <section className="space-y-10">
           <div className="space-y-3">
             <span className="font-mono text-xs text-zinc-500 tracking-wider uppercase block">
-              Section 06 • Engineering Contributions
+              Section 06
             </span>
-            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-white">
-              Turning complex AI workflows into production-ready systems.
+            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">
+              How I Can Contribute
             </h2>
+            <p className="text-lg text-zinc-300 font-medium">
+              Turning complex AI workflows into production-ready systems.
+            </p>
             <p className="text-sm text-zinc-400 leading-relaxed max-w-3xl">
               Moving agentic systems from speculative demos to resilient production requires deep full-stack execution across orchestration, distributed backend systems, and model-level guardrails:
             </p>
