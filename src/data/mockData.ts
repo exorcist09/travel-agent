@@ -617,7 +617,7 @@ export const EVALUATION_TEST_CASES: EvaluationTestCase[] = [
 export const MODEL_CONFIGURATIONS: ModelConfiguration[] = [
   {
     id: 'config-a',
-    name: 'Airial Baseline',
+    name: 'AgentLens Baseline',
     tagline: 'GPT-4o (Planner & Hotel) + GPT-4o mini (Flight & Activities)',
     accuracy: 87.4,
     latency: 8.2,
@@ -639,7 +639,7 @@ export const MODEL_CONFIGURATIONS: ModelConfiguration[] = [
   },
   {
     id: 'config-b',
-    name: 'Airial Fast-Route',
+    name: 'AgentLens Fast-Route',
     tagline: 'Claude 3.5 Sonnet (Planner) + Claude 3.5 Haiku (All Research Agents)',
     accuracy: 89.2,
     latency: 5.6,
@@ -661,7 +661,7 @@ export const MODEL_CONFIGURATIONS: ModelConfiguration[] = [
   },
   {
     id: 'config-c',
-    name: 'Airial Hybrid Ensemble',
+    name: 'AgentLens Hybrid Ensemble',
     tagline: 'Custom LoRA Router + Llama 3.3 70B (Local) + Claude 3.5 Sonnet Fallback',
     accuracy: 85.8,
     latency: 6.4,

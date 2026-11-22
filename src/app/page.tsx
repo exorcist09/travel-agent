@@ -1,523 +1,370 @@
-'use client';
+import React from 'react';
 
-import React, { useState } from 'react';
-import {
-  TrendingUp,
-  TrendingDown,
-  ArrowRight,
-  CheckCircle2,
-  XCircle,
-  AlertTriangle,
-  Zap,
-  Sliders,
-  ChevronRight,
-  Compass,
-} from 'lucide-react';
+export default function AgentLensLandingPage() {
+  const workflowNodes = [
+    {
+      name: 'User Input',
+      type: 'Ingress',
+      meta: [
+        { label: 'Latency', value: '14ms' },
+        { label: 'Status', value: 'Parsed' },
+      ],
+    },
+    {
+      name: 'Agent Orchestrator',
+      type: 'Routing DAG',
+      meta: [
+        { label: 'Latency', value: '160ms' },
+        { label: 'Tokens', value: '240 tok' },
+      ],
+    },
+    {
+      name: 'Research Agents',
+      type: 'Sub-Agent Pool',
+      meta: [
+        { label: 'Latency', value: '2.8s' },
+        { label: 'Accuracy', value: '91%' },
+      ],
+    },
+    {
+      name: 'External Tools',
+      type: 'Suppliers & APIs',
+      meta: [
+        { label: 'Latency', value: '1.9s' },
+        { label: 'Calls', value: '4 endpoints' },
+      ],
+    },
+    {
+      name: 'Result Validation',
+      type: 'Guardrail Engine',
+      meta: [
+        { label: 'Latency', value: '120ms' },
+        { label: 'Status', value: 'Passed' },
+      ],
+    },
+    {
+      name: 'Final Output',
+      type: 'Delivery',
+      meta: [
+        { label: 'Total Time', value: '4.9s' },
+        { label: 'Est. Cost', value: '$0.078' },
+      ],
+    },
+  ];
 
-import {
-  AGENT_PERFORMANCE_DATA,
-  EXECUTION_TIMELINE_NODES,
-  EVALUATION_TEST_CASES,
-  ENGINEERING_RECOMMENDATIONS,
-} from '@/data/mockData';
-import { AgentPerformance } from '@/types';
-import { AgentDetailModal } from '@/components/AgentDetailModal';
+  const agentData = [
+    { name: 'Destination Research', accuracy: '96%', latency: '1.2s', cost: '$0.012' },
+    { name: 'Flight Research', accuracy: '91%', latency: '2.8s', cost: '$0.025' },
+    { name: 'Hotel Research', accuracy: '84%', latency: '3.1s', cost: '$0.030' },
+    { name: 'Activities Research', accuracy: '89%', latency: '1.8s', cost: '$0.010' },
+    { name: 'Itinerary Planner', accuracy: '78%', latency: '4.2s', cost: '$0.007' },
+  ];
 
-export default function CleanLandingPage() {
-  const [isOptimized, setIsOptimized] = useState(false);
-  const [selectedAgent, setSelectedAgent] = useState<AgentPerformance | null>(null);
-  const [selectedNodeId, setSelectedNodeId] = useState<string>('node-hotel-search');
-  const [filterTestStatus, setFilterTestStatus] = useState<'all' | 'failed' | 'passed'>('all');
-  const [expandedRecId, setExpandedRecId] = useState<string | null>('rec-01');
-  const [expandedTestId, setExpandedTestId] = useState<string | null>('tc-002');
+  const evaluationDimensions = [
+    {
+      title: 'Agent Performance',
+      description: 'Measure individual agent execution time, success rate and output quality.',
+    },
+    {
+      title: 'Accuracy & Constraint Validation',
+      description: 'Check whether generated results satisfy user requirements and business constraints.',
+    },
+    {
+      title: 'Latency',
+      description: 'Identify slow agents, expensive tool calls and unnecessary sequential operations.',
+    },
+    {
+      title: 'Token Usage & Cost',
+      description: 'Track model consumption and estimate the cost of individual executions.',
+    },
+    {
+      title: 'Reliability',
+      description: 'Identify failed tool calls, timeouts, retries and inconsistent outputs.',
+    },
+  ];
 
-  const activeNode =
-    EXECUTION_TIMELINE_NODES.find((n) => n.id === selectedNodeId) ||
-    EXECUTION_TIMELINE_NODES[3];
-
-  const filteredTests = EVALUATION_TEST_CASES.filter((tc) => {
-    if (filterTestStatus === 'passed' && tc.status !== 'passed') return false;
-    if (filterTestStatus === 'failed' && tc.status !== 'failed') return false;
-    return true;
-  });
+  const improvementExamples = [
+    {
+      title: 'Reduce Latency',
+      problem: 'Independent agents execute sequentially.',
+      improvement: 'Run independent research tasks concurrently and optimise orchestration.',
+      metricNote: 'Estimated 35–45% latency reduction via async fan-out.',
+    },
+    {
+      title: 'Improve Accuracy',
+      problem: 'Generated itineraries violate budget, timing or location constraints.',
+      improvement: 'Introduce deterministic validation, structured outputs and verification steps.',
+      metricNote: 'Enforces strict JSON schema validation before final delivery.',
+    },
+    {
+      title: 'Reduce Cost',
+      problem: 'Repeated model calls increase token consumption.',
+      improvement: 'Use model routing, caching and smaller models for simpler tasks.',
+      metricNote: 'Routes deterministic lookup queries to lightweight distilled models.',
+    },
+    {
+      title: 'Improve Reliability',
+      problem: 'External API failures interrupt workflows.',
+      improvement: 'Introduce retries, timeouts, fallbacks and graceful degradation.',
+      metricNote: 'Exponential backoff with circuit breaker failovers.',
+    },
+  ];
 
   return (
-    <div className="min-h-screen bg-[#0c0c0e] text-zinc-100 font-sans selection:bg-blue-600/30 selection:text-white">
-      {/* Top Navbar */}
-      <nav className="sticky top-0 z-40 bg-[#0c0c0e]/90 backdrop-blur-md border-b border-white/10">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
-          <a href="#" className="flex items-center gap-2 text-white font-semibold text-sm tracking-tight">
-            <Compass className="w-4 h-4 text-blue-500" />
-            <span>Travel AI Engine</span>
-          </a>
-
-          <div className="hidden md:flex items-center gap-6 text-xs text-zinc-400">
-            <a href="#overview" className="hover:text-white transition-colors">Overview</a>
-            <a href="#matrix" className="hover:text-white transition-colors">Metrics</a>
-            <a href="#architecture" className="hover:text-white transition-colors">Architecture</a>
-            <a href="#guardrails" className="hover:text-white transition-colors">Guardrails</a>
-            <a href="#improvements" className="hover:text-white transition-colors">Roadmap</a>
+    <div className="min-h-screen bg-[#fafafa] text-zinc-900 font-sans">
+      {/* Top Header Bar */}
+      <header className="border-b border-zinc-200 bg-white">
+        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="font-semibold text-sm tracking-tight text-zinc-950">
+              AgentLens
+            </span>
+            <span className="text-zinc-400 font-mono text-xs">/</span>
+            <span className="text-zinc-500 font-mono text-xs">
+              Engineering Concept
+            </span>
           </div>
-
-          <button
-            onClick={() => setIsOptimized(!isOptimized)}
-            className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium border transition-colors ${
-              isOptimized
-                ? 'bg-emerald-950 text-emerald-300 border-emerald-800'
-                : 'bg-blue-600 text-white border-blue-500 hover:bg-blue-500'
-            }`}
-          >
-            <Sliders className="w-3.5 h-3.5" />
-            <span>{isOptimized ? 'Revert Baseline' : 'Simulate 40% Latency Drop'}</span>
-          </button>
+          <span className="text-xs text-zinc-500 font-mono">
+            Conceptual Presentation
+          </span>
         </div>
-      </nav>
+      </header>
 
-      {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-12 space-y-20">
+      {/* Main Content Area */}
+      <main className="max-w-5xl mx-auto px-6 py-16 space-y-28">
         {/* ========================================================= */}
-        {/* SECTION 1: HERO & CORE METRICS — WHAT IT DOES            */}
+        {/* SECTION ONE — INTRODUCTION                                */}
         {/* ========================================================= */}
-        <section id="overview" className="space-y-6 pt-2">
-          <div className="max-w-2xl space-y-3">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight">
-              Evaluating & Optimizing Multi-Agent Travel AI
+        <section className="space-y-12">
+          {/* Centered Explanatory Narrative */}
+          <div className="max-w-3xl mx-auto text-center space-y-5">
+            <span className="font-mono text-xs text-zinc-500 tracking-wider uppercase">
+              AI Agent Evaluation & Optimisation
+            </span>
+
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-zinc-950 leading-tight">
+              Making AI Agents More Accurate, Faster and More Reliable.
             </h1>
-            <p className="text-sm sm:text-base text-zinc-400 leading-normal">
-              Monitor latency, accuracy, and unit economics across specialized travel agents in real time.
+
+            <p className="text-base text-zinc-600 leading-relaxed max-w-2xl mx-auto">
+              Multi-agent AI systems coordinate models, tools and external APIs to complete complex tasks. But as workflows become more sophisticated, understanding their performance becomes increasingly difficult.
+            </p>
+
+            <p className="text-sm text-zinc-500 leading-relaxed max-w-2xl mx-auto">
+              AgentLens is a proposed evaluation and optimisation layer that makes agent behaviour measurable, exposes execution bottlenecks and identifies opportunities for improvement.
             </p>
           </div>
 
-          {/* 4 Core Metrics */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            {/* Accuracy */}
-            <div className="bg-[#121214] border border-white/10 rounded-lg p-4">
-              <div className="text-xs text-zinc-500 font-mono">Accuracy</div>
-              <div className="text-2xl sm:text-3xl font-semibold font-mono text-white mt-1">
-                {isOptimized ? '93.2%' : '87.4%'}
-              </div>
-              <div className="mt-2 text-[11px] font-mono text-emerald-400">
-                {isOptimized ? '+5.8% Projected' : '+2.1% vs prev'}
-              </div>
+          {/* Technical Visualisation of Multi-Agent Workflow */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between text-xs text-zinc-500 font-mono">
+              <span>Multi-Agent Execution Pipeline</span>
+              <span>Sequential & Concurrent Graph</span>
             </div>
 
-            {/* Latency */}
-            <div className="bg-[#121214] border border-white/10 rounded-lg p-4">
-              <div className="text-xs text-zinc-500 font-mono">Execution Time</div>
-              <div className="text-2xl sm:text-3xl font-semibold font-mono text-white mt-1">
-                {isOptimized ? '4.9s' : '8.2s'}
-              </div>
-              <div className="mt-2 text-[11px] font-mono text-emerald-400">
-                {isOptimized ? '-3.3s (-40%)' : '-0.8s vs prev'}
-              </div>
-            </div>
+            <div className="border border-zinc-200 bg-white rounded-lg p-5">
+              <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
+                {workflowNodes.map((node, index) => {
+                  const isLast = index === workflowNodes.length - 1;
 
-            {/* Cost */}
-            <div className="bg-[#121214] border border-white/10 rounded-lg p-4">
-              <div className="text-xs text-zinc-500 font-mono">Cost per Trip</div>
-              <div className="text-2xl sm:text-3xl font-semibold font-mono text-white mt-1">
-                {isOptimized ? '$0.052' : '$0.084'}
-              </div>
-              <div className="mt-2 text-[11px] font-mono text-emerald-400">
-                {isOptimized ? '-$0.032 (-38%)' : '-$0.012 vs prev'}
-              </div>
-            </div>
+                  return (
+                    <div
+                      key={node.name}
+                      className="border border-zinc-200 rounded p-3 bg-zinc-50/50 flex flex-col justify-between space-y-3"
+                    >
+                      <div className="space-y-1">
+                        <span className="font-mono text-[10px] text-zinc-400 uppercase tracking-wider block">
+                          Step 0{index + 1}
+                        </span>
+                        <div className="font-semibold text-xs text-zinc-900 leading-snug">
+                          {node.name}
+                        </div>
+                        <span className="text-[11px] text-zinc-500 block">
+                          {node.type}
+                        </span>
+                      </div>
 
-            {/* Failure Rate */}
-            <div className="bg-[#121214] border border-white/10 rounded-lg p-4">
-              <div className="text-xs text-zinc-500 font-mono">Failure Rate</div>
-              <div className="text-2xl sm:text-3xl font-semibold font-mono text-white mt-1">
-                {isOptimized ? '1.2%' : '4.8%'}
+                      <div className="border-t border-zinc-200/60 pt-2 space-y-1 font-mono text-[11px]">
+                        {node.meta.map((m) => (
+                          <div key={m.label} className="flex justify-between text-zinc-600">
+                            <span className="text-zinc-400">{m.label}:</span>
+                            <span className="font-medium text-zinc-800">{m.value}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-              <div className="mt-2 text-[11px] font-mono text-emerald-400">
-                {isOptimized ? '-3.6% Resilient' : '-0.4% vs prev'}
+
+              <div className="mt-4 pt-3 border-t border-zinc-100 flex items-center justify-between text-[11px] font-mono text-zinc-400">
+                <span>User Input → Agent Orchestrator → Research Agents → External Tools → Result Validation → Final Output</span>
+                <span>Simulated Trace Data</span>
               </div>
             </div>
           </div>
         </section>
 
         {/* ========================================================= */}
-        {/* SECTION 2: LIVE PERFORMANCE MATRIX — WHAT IT MONITORS     */}
+        {/* SECTION TWO — WHAT IT EVALUATES                           */}
         {/* ========================================================= */}
-        <section id="matrix" className="space-y-4">
-          <div className="border-b border-white/10 pb-3 flex items-center justify-between">
-            <h2 className="text-lg sm:text-xl font-bold text-white tracking-tight">
-              Agent Performance Matrix
-            </h2>
-            <span className="text-xs text-zinc-500 font-mono">
-              Click row to inspect
+        <section className="space-y-10">
+          <div className="space-y-2">
+            <span className="font-mono text-xs text-zinc-500 tracking-wider uppercase">
+              Evaluation Dimensions
             </span>
+            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-950">
+              Understand every step of an AI workflow.
+            </h2>
           </div>
 
-          <div className="bg-[#121214] border border-white/10 rounded-lg overflow-hidden">
-            <div className="overflow-x-auto">
+          {/* The Five Dimensions */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {evaluationDimensions.map((dim, idx) => (
+              <div
+                key={dim.title}
+                className="border border-zinc-200 bg-white rounded-lg p-5 space-y-2"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-xs text-zinc-400">0{idx + 1}</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-zinc-300"></span>
+                </div>
+                <h3 className="font-semibold text-sm text-zinc-950">
+                  {dim.title}
+                </h3>
+                <p className="text-xs text-zinc-600 leading-relaxed">
+                  {dim.description}
+                </p>
+              </div>
+            ))}
+
+            {/* Explanatory summary tile */}
+            <div className="border border-zinc-200 bg-zinc-100/60 rounded-lg p-5 flex flex-col justify-between space-y-2">
+              <span className="font-mono text-xs text-zinc-500 uppercase">
+                Observability Scope
+              </span>
+              <p className="text-xs text-zinc-600 leading-relaxed">
+                By capturing performance across all five dimensions simultaneously, engineering teams can detect regressions immediately upon deployment.
+              </p>
+              <span className="text-[11px] font-mono text-zinc-400">
+                Deterministic + Statistical Metrics
+              </span>
+            </div>
+          </div>
+
+          {/* Sample Agent Execution Timeline Table */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-xs text-zinc-500">
+              <span className="font-semibold text-zinc-700">Sample Agent Execution Profile</span>
+              <span className="font-mono text-zinc-400">Illustrative simulated data</span>
+            </div>
+
+            <div className="border border-zinc-200 bg-white rounded-lg overflow-hidden">
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr className="bg-[#16161a] border-b border-white/10 text-zinc-400 font-mono text-[11px]">
-                    <th className="py-2.5 px-4 font-medium text-zinc-300">Agent</th>
-                    <th className="py-2.5 px-3">Model</th>
-                    <th className="py-2.5 px-3 text-right">Accuracy</th>
-                    <th className="py-2.5 px-3 text-right">Latency</th>
-                    <th className="py-2.5 px-3 text-right">Cost</th>
-                    <th className="py-2.5 px-4 text-center">Status</th>
-                    <th className="py-2.5 px-3 text-right sr-only">Action</th>
+                  <tr className="bg-zinc-50 border-b border-zinc-200 font-mono text-[11px] text-zinc-500">
+                    <th className="py-3 px-5 font-semibold text-zinc-700">Agent</th>
+                    <th className="py-3 px-4 text-right">Accuracy</th>
+                    <th className="py-3 px-4 text-right">Latency</th>
+                    <th className="py-3 px-4 text-right">Cost</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5 font-mono">
-                  {AGENT_PERFORMANCE_DATA.map((agent) => {
-                    const isHealthy = agent.status === 'Healthy';
-
-                    return (
-                      <tr
-                        key={agent.id}
-                        onClick={() => setSelectedAgent(agent)}
-                        className="cursor-pointer hover:bg-white/[0.03] transition-colors group"
-                      >
-                        <td className="py-3 px-4 font-sans font-medium text-white">
-                          <div>{agent.name}</div>
-                          <div className="text-[11px] text-zinc-500 line-clamp-1 font-normal font-sans">
-                            {agent.role}
-                          </div>
-                        </td>
-
-                        <td className="py-3 px-3 text-zinc-400 text-[11px]">
-                          {agent.model}
-                        </td>
-
-                        <td className="py-3 px-3 text-right font-medium">
-                          <span className={agent.accuracy >= 90 ? 'text-emerald-400' : 'text-amber-400'}>
-                            {agent.accuracy}%
-                          </span>
-                        </td>
-
-                        <td className="py-3 px-3 text-right text-zinc-300">
-                          {agent.latency}s
-                        </td>
-
-                        <td className="py-3 px-3 text-right text-zinc-300">
-                          ${agent.cost.toFixed(3)}
-                        </td>
-
-                        <td className="py-3 px-4 text-center">
-                          <span
-                            className={`text-[11px] font-medium ${
-                              isHealthy ? 'text-emerald-400' : 'text-amber-400'
-                            }`}
-                          >
-                            {agent.status}
-                          </span>
-                        </td>
-
-                        <td className="py-3 px-3 text-right text-zinc-500 group-hover:text-blue-400">
-                          <ChevronRight className="w-4 h-4 ml-auto" />
-                        </td>
-                      </tr>
-                    );
-                  })}
+                <tbody className="divide-y divide-zinc-100 font-mono">
+                  {agentData.map((row) => (
+                    <tr key={row.name} className="hover:bg-zinc-50/50">
+                      <td className="py-3.5 px-5 font-sans font-medium text-zinc-900">
+                        {row.name}
+                      </td>
+                      <td className="py-3.5 px-4 text-right text-zinc-800">
+                        {row.accuracy}
+                      </td>
+                      <td className="py-3.5 px-4 text-right text-zinc-800">
+                        {row.latency}
+                      </td>
+                      <td className="py-3.5 px-4 text-right text-zinc-800">
+                        {row.cost}
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
+            <p className="text-[11px] font-mono text-zinc-400 text-right">
+              All values shown above are illustrative benchmarks, not live telemetry.
+            </p>
           </div>
         </section>
 
         {/* ========================================================= */}
-        {/* SECTION 3: HOW IMPLEMENTATION HAPPENS (THE TRAVEL DAG)    */}
+        {/* SECTION THREE — HOW PERFORMANCE CAN BE IMPROVED           */}
         {/* ========================================================= */}
-        <section id="architecture" className="space-y-4">
-          <div className="border-b border-white/10 pb-3 flex items-center justify-between">
-            <h2 className="text-lg sm:text-xl font-bold text-white tracking-tight">
-              Multi-Agent Travel Graph
-            </h2>
-            <span className="text-xs text-zinc-500 font-mono">
-              End-to-end execution pipeline
-            </span>
-          </div>
-
-          {/* Workflow DAG Nodes */}
-          <div className="bg-[#121214] border border-white/10 rounded-lg p-3 sm:p-4 overflow-x-auto">
-            <div className="flex items-center min-w-[700px] justify-between">
-              {EXECUTION_TIMELINE_NODES.map((node, index) => {
-                const isSelected = node.id === activeNode.id;
-                const isLast = index === EXECUTION_TIMELINE_NODES.length - 1;
-
-                return (
-                  <React.Fragment key={node.id}>
-                    <button
-                      onClick={() => setSelectedNodeId(node.id)}
-                      className={`flex-1 min-w-[100px] max-w-[130px] text-left p-2.5 rounded-md border transition-all ${
-                        isSelected
-                          ? 'border-blue-500 bg-blue-600/10 text-white'
-                          : 'border-white/10 bg-[#16161a] hover:bg-white/5 text-zinc-300'
-                      }`}
-                    >
-                      <div className="text-[10px] font-mono text-zinc-500 mb-0.5">
-                        0{node.stepNumber}
-                      </div>
-                      <div className="font-medium text-xs truncate text-white">
-                        {node.name}
-                      </div>
-                      <div className="mt-1 text-[10px] font-mono text-zinc-400 flex justify-between">
-                        <span>{node.duration}</span>
-                        <span>{node.tokens} tok</span>
-                      </div>
-                    </button>
-
-                    {!isLast && (
-                      <div className="px-1 text-zinc-600 shrink-0">
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </div>
-                    )}
-                  </React.Fragment>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Active Node Inspector */}
-          <div className="bg-[#121214] border border-white/10 rounded-lg p-4 space-y-3">
-            <div className="flex items-center justify-between pb-2 border-b border-white/5 text-xs">
-              <div className="font-semibold text-white">
-                Step {activeNode.stepNumber}: {activeNode.name}
-              </div>
-              <div className="font-mono text-zinc-400 flex gap-3 text-[11px]">
-                <span>{activeNode.duration}</span>
-                <span>•</span>
-                <span>{activeNode.tokens} tokens</span>
-                <span>•</span>
-                <span>{activeNode.cost}</span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-              <div className="space-y-1">
-                <span className="text-[10px] font-mono text-zinc-500 uppercase">Tools & APIs:</span>
-                <div className="space-y-1">
-                  {activeNode.toolsCalled.map((tool, i) => (
-                    <div
-                      key={i}
-                      className="p-2 rounded bg-[#16161a] border border-white/5 flex items-center justify-between font-mono text-[11px]"
-                    >
-                      <span className="text-zinc-200">{tool.name}</span>
-                      <span className="text-zinc-400">{tool.latencyMs}ms</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-1">
-                <span className="text-[10px] font-mono text-zinc-500 uppercase">Guardrail Check:</span>
-                <div className="p-2.5 rounded bg-[#16161a] border border-white/5 text-xs space-y-1">
-                  <div className="font-mono font-medium text-zinc-200 flex justify-between">
-                    <span>{activeNode.validationCheck.name}</span>
-                    <span className={activeNode.validationCheck.passed ? 'text-emerald-400' : 'text-amber-400'}>
-                      {Math.round(activeNode.validationCheck.score * 100)}%
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-zinc-400 leading-normal">
-                    {activeNode.validationCheck.detail}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ========================================================= */}
-        {/* SECTION 4: TEST HARNESS & GUARDRAIL ASSERTIONS            */}
-        {/* ========================================================= */}
-        <section id="guardrails" className="space-y-4">
-          <div className="border-b border-white/10 pb-3 flex items-center justify-between">
-            <h2 className="text-lg sm:text-xl font-bold text-white tracking-tight">
-              Test Harness & Assertions
-            </h2>
-            <div className="flex gap-1 text-xs">
-              <button
-                onClick={() => setFilterTestStatus('all')}
-                className={`px-2.5 py-1 rounded text-xs transition-colors ${
-                  filterTestStatus === 'all'
-                    ? 'bg-blue-600 text-white'
-                    : 'text-zinc-400 hover:text-white bg-[#16161a]'
-                }`}
-              >
-                All
-              </button>
-              <button
-                onClick={() => setFilterTestStatus('failed')}
-                className={`px-2.5 py-1 rounded text-xs transition-colors ${
-                  filterTestStatus === 'failed'
-                    ? 'bg-rose-600 text-white'
-                    : 'text-rose-400 hover:text-rose-300 bg-[#16161a]'
-                }`}
-              >
-                Failed (2)
-              </button>
-              <button
-                onClick={() => setFilterTestStatus('passed')}
-                className={`px-2.5 py-1 rounded text-xs transition-colors ${
-                  filterTestStatus === 'passed'
-                    ? 'bg-emerald-600 text-white'
-                    : 'text-emerald-400 hover:text-emerald-300 bg-[#16161a]'
-                }`}
-              >
-                Passed (6)
-              </button>
-            </div>
-          </div>
-
+        <section className="space-y-10">
           <div className="space-y-2">
-            {filteredTests.map((tc) => {
-              const isExpanded = expandedTestId === tc.id;
-              const isPassed = tc.status === 'passed';
-
-              return (
-                <div
-                  key={tc.id}
-                  className="bg-[#121214] border border-white/10 rounded-lg overflow-hidden text-xs"
-                >
-                  <div
-                    onClick={() => setExpandedTestId(isExpanded ? null : tc.id)}
-                    className="p-3 cursor-pointer flex items-center justify-between gap-2 hover:bg-white/[0.02]"
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      {isPassed ? (
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                      ) : (
-                        <XCircle className="w-4 h-4 text-rose-400 shrink-0" />
-                      )}
-                      <div className="truncate">
-                        <span className="font-medium text-white">{tc.name}</span>
-                        <span className="text-zinc-500 ml-2 hidden sm:inline">&ldquo;{tc.prompt}&rdquo;</span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-3 shrink-0 font-mono text-[11px]">
-                      <span className={isPassed ? 'text-emerald-400' : 'text-rose-400'}>
-                        {tc.accuracyScore}%
-                      </span>
-                      <ChevronRight
-                        className={`w-3.5 h-3.5 text-zinc-500 transition-transform ${
-                          isExpanded ? 'rotate-90' : ''
-                        }`}
-                      />
-                    </div>
-                  </div>
-
-                  {isExpanded && (
-                    <div className="border-t border-white/5 p-3 bg-[#16161a] text-[11px] space-y-2">
-                      <div className="text-zinc-300 leading-relaxed">
-                        <strong className={isPassed ? 'text-emerald-400' : 'text-rose-400'}>
-                          {isPassed ? 'Passed: ' : 'Root Cause: '}
-                        </strong>
-                        {tc.explanation}
-                      </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-zinc-400 font-mono">
-                        <div>Expected: {tc.expectedBehavior}</div>
-                        <div>Actual: {tc.actualBehavior}</div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* ========================================================= */}
-        {/* SECTION 5: HOW IMPROVEMENTS HAPPEN (ROADMAP)              */}
-        {/* ========================================================= */}
-        <section id="improvements" className="space-y-4">
-          <div className="border-b border-white/10 pb-3 flex items-center justify-between">
-            <h2 className="text-lg sm:text-xl font-bold text-white tracking-tight">
-              Engineering Improvements
-            </h2>
-            <span className="text-xs text-zinc-500 font-mono">
-              Actionable optimizations
+            <span className="font-mono text-xs text-zinc-500 tracking-wider uppercase">
+              Engineering Solutions
             </span>
+            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-950">
+              From observing problems to engineering solutions.
+            </h2>
           </div>
 
-          <div className="space-y-2.5">
-            {ENGINEERING_RECOMMENDATIONS.slice(0, 4).map((rec) => {
-              const isExpanded = expandedRecId === rec.id;
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {improvementExamples.map((item, index) => (
+              <div
+                key={item.title}
+                className="border border-zinc-200 bg-white rounded-lg p-6 space-y-4"
+              >
+                <div className="flex items-baseline justify-between border-b border-zinc-100 pb-3">
+                  <h3 className="font-semibold text-sm text-zinc-950">
+                    {item.title}
+                  </h3>
+                  <span className="font-mono text-xs text-zinc-400">
+                    0{index + 1}
+                  </span>
+                </div>
 
-              return (
-                <div
-                  key={rec.id}
-                  className="bg-[#121214] border border-white/10 rounded-lg overflow-hidden text-xs"
-                >
-                  <div
-                    onClick={() => setExpandedRecId(isExpanded ? null : rec.id)}
-                    className="p-3.5 cursor-pointer flex items-center justify-between gap-3 hover:bg-white/[0.02]"
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <span
-                        className={`font-mono text-[10px] font-semibold px-1.5 py-0.5 rounded ${
-                          rec.priority === 'P0' ? 'bg-rose-950 text-rose-300' : 'bg-amber-950 text-amber-300'
-                        }`}
-                      >
-                        {rec.priority}
-                      </span>
-                      <span className="font-semibold text-white truncate">{rec.title}</span>
-                    </div>
-
-                    <div className="flex items-center gap-3 shrink-0 font-mono text-[11px]">
-                      <span className="text-emerald-400">{rec.metricsSimulated.delta}</span>
-                      <ChevronRight
-                        className={`w-3.5 h-3.5 text-zinc-500 transition-transform ${
-                          isExpanded ? 'rotate-90' : ''
-                        }`}
-                      />
-                    </div>
+                <div className="space-y-3 text-xs leading-relaxed">
+                  <div>
+                    <span className="font-mono text-[10px] text-zinc-400 uppercase tracking-wider block mb-0.5">
+                      Problem
+                    </span>
+                    <p className="text-zinc-700 font-medium">
+                      {item.problem}
+                    </p>
                   </div>
 
-                  {isExpanded && (
-                    <div className="border-t border-white/5 p-4 bg-[#16161a] space-y-3 text-[11px]">
-                      <div className="text-zinc-300 leading-relaxed">
-                        <strong className="text-zinc-100">Fix: </strong>
-                        {rec.suggestedImprovement}
-                      </div>
+                  <div>
+                    <span className="font-mono text-[10px] text-zinc-400 uppercase tracking-wider block mb-0.5">
+                      Improvement
+                    </span>
+                    <p className="text-zinc-600">
+                      {item.improvement}
+                    </p>
+                  </div>
 
-                      <div className="font-mono text-emerald-400 bg-emerald-950/40 p-2 rounded border border-emerald-900/50 flex justify-between">
-                        <span>Expected Impact: {rec.metricsSimulated.beforeMetric} → {rec.metricsSimulated.afterMetric}</span>
-                        <span>{rec.metricsSimulated.delta}</span>
-                      </div>
-
-                      {rec.codeSnippet && (
-                        <div className="bg-[#0e0e12] text-zinc-300 p-3 rounded font-mono text-[11px] overflow-x-auto border border-white/5">
-                          <div className="text-[10px] text-zinc-500 mb-1">{rec.codeSnippet.filename}</div>
-                          <pre className="whitespace-pre">{rec.codeSnippet.diff}</pre>
-                        </div>
-                      )}
-                    </div>
-                  )}
+                  <div className="pt-2 border-t border-zinc-100 text-[11px] font-mono text-zinc-500">
+                    {item.metricNote}
+                  </div>
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
         </section>
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-white/10 bg-[#0c0c0e] py-8 mt-16 text-xs text-zinc-500">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="font-medium text-zinc-300 flex items-center gap-1.5">
-            <Compass className="w-3.5 h-3.5 text-blue-500" />
-            <span>Travel AI Engine</span>
+      <footer className="border-t border-zinc-200 bg-white py-10 mt-20 text-xs text-zinc-500">
+        <div className="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <span className="font-medium text-zinc-900">AgentLens</span>
+            <span>•</span>
+            <span>AI Agent Evaluation & Optimisation Concept</span>
           </div>
-          <div className="text-[11px] font-mono text-zinc-500">
-            Independent concept prototype by Adarsh Verma.
+          <div className="font-mono text-[11px] text-zinc-400">
+            Conceptual engineering presentation by Adarsh Verma. Simulated illustrative data.
           </div>
         </div>
       </footer>
-
-      {/* Agent Detail Modal */}
-      <AgentDetailModal
-        agent={selectedAgent}
-        onClose={() => setSelectedAgent(null)}
-        onJumpToRecommendation={() => {
-          const el = document.getElementById('improvements');
-          if (el) el.scrollIntoView({ behavior: 'smooth' });
-        }}
-      />
     </div>
   );
 }
