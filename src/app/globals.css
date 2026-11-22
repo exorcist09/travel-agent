@@ -3,9 +3,9 @@
 @tailwind utilities;
 
 :root {
-  --background: #fbfbfb;
-  --foreground: #0f172a;
-  --border: #e2e8f0;
+  --background: #0c0c0e;
+  --foreground: #f4f4f5;
+  --border: rgba(255, 255, 255, 0.08);
 }
 
 body {
@@ -15,21 +15,21 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Custom scrollbar for dense dev tool views */
+/* Custom dark scrollbar matching Kairo */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #0c0c0e;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #27272a;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #3f3f46;
 }

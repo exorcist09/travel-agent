@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Airial — AI Agent Evaluation & Observability Dashboard',
-  description: 'Engineering prototype for evaluating multi-agent travel engine accuracy, latency, token consumption, and cost optimization. Concept by Adarsh Verma.',
+  title: 'Travel AI Engine — Multi-Agent Evaluation & Observability Platform',
+  description: 'Observability, latency profiling, and guardrail evaluation for multi-agent travel engines. Concept prototype by Adarsh Verma.',
 };
 
 export default function RootLayout({
@@ -12,8 +12,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="h-full">
-      <body className="min-h-screen bg-[#fafafa] text-slate-900 font-sans antialiased selection:bg-slate-200 selection:text-slate-900">
+    <html lang="en" className="dark h-full">
+      <body className="min-h-screen bg-[#0c0c0e] text-zinc-100 antialiased selection:bg-zinc-800 selection:text-white font-sans">
         {children}
       </body>
     </html>
